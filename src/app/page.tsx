@@ -1,29 +1,40 @@
 import Image from "next/image";
+import { Image as IImage } from "sanity";
 import { client } from "../../sanity/lib/client";
 import { product } from "../../sanity/product";
 
 export const getProductData = async () => {
   const res = await client.fetch(`*[_type=="product"]{
+    id,
     product,
     category,
-    price
+    group -> {
+      name
+    },
+    price,
+    image
   }`);
   return res;
 };
 
 interface IProduct {
-  product: "string";
-  category: "string";
-  price: "number";
+  id: number;
+  product: string;
+  category: string;
+  group: {
+    name: string;
+  };
+  price: number;
+  image: IImage;
 }
 
 export default async function Home() {
   const data: IProduct[] = await getProductData();
-  console.log(data);
+  // console.log(data);
   return (
     <div>
       {data.map((product) => (
-        <h1>{product.product}</h1>
+        <h1 key={product.id}>{product.group.name}</h1>
       ))}
     </div>
   );
